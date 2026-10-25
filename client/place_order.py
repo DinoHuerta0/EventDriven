@@ -1,13 +1,14 @@
 from common.broker import connect, publish_event                          
 from common.events import Customer, Event, Item, Order                    
 from common.topology import EVENT_TYPES, RK_ORDER_REQUESTED 
+from uuid import uuid4
 
 SERVICE_NAME = "client-app"                                                      
 
 connection, channel = connect() 
 
 order = Order(
-    order_id="ORD-001",
+    order_id=f"ORD-{uuid4().hex[:8].upper()}",
     customer=Customer(name="Ana", email="ana@example.com"),
     items=[
         Item(sku="SKU-1", name="Mouse", unit_price=549.0, quantity=2),
