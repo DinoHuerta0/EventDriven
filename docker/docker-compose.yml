@@ -6,18 +6,69 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_port_connectivity"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  order-placement:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: event-driven:latest
+    command: ["python", "service/order_placement.py"]
+    volumes:
+      - ../logs:/app/logs
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+  payment:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: event-driven:latest
+    command: ["python", "service/payment.py"]
+    volumes:
+      - ../logs:/app/logs
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  order-fulfillment:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: event-driven:latest
+    command: ["python", "service/order_fulfillment.py"]
+    volumes:
+      - ../logs:/app/logs
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    
+  notification:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: event-driven:latest
+    command: ["python", "service/notification.py"]
+    volumes:
+      - ../logs:/app/logs
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
 
   app:
     build:
       context: ..
       dockerfile: docker/Dockerfile
-    environment:
-      PYTHONPATH: /app
+    image: event-driven:latest
+    profiles: ["cli"]
+    command: ["python", "place_order.py"]
     volumes:
-      - ../test:/app/test:ro
-      - ../common:/app/common:ro
-      - ../client:/app/client:ro
-      - ../service:/app/service:ro
       - ../logs:/app/logs
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
