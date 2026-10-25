@@ -1,13 +1,10 @@
-import pika
-from common.events import Order, Item, Customer, Event, serialize
-from common.topology import declare_topology, EXCHANGE_NAME, RK_ORDER_REQUESTED   
-from common.logger import log_event
+from common.broker import connect, publish_event                          
+from common.events import Customer, Event, Item, Order                    
+from common.topology import EVENT_TYPES, RK_ORDER_REQUESTED 
 
 SERVICE_NAME = "client-app"                                                      
 
-connection = pika.BlockingConnection(pika.ConnectionParameters(host="rabbitmq"))
-channel = connection.channel()
-declare_topology(channel)
+connection, channel = connect() 
 
 order = Order(
     order_id="ORD-001",
@@ -18,11 +15,12 @@ order = Order(
     total=1098.0,
 )
 
-event = Event(event_type="OrderRequested", producer=SERVICE_NAME, payload=order)
+event = Event(
+    event_type=EVENT_TYPES[RK_ORDER_REQUESTED],                          
+    producer=SERVICE_NAME,
+    payload=order,
+)
 
-channel.basic_publish(exchange=EXCHANGE_NAME, routing_key=RK_ORDER_REQUESTED, body=serialize(event))
-print(f"Enviado | {event.event_type} | event_id={event.event_id}")
-
-log_event("client-app", "produced", event, RK_ORDER_REQUESTED)
+publish_event(channel, SERVICE_NAME, RK_ORDER_REQUESTED, event) 
 
 connection.close()

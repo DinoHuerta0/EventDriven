@@ -19,6 +19,14 @@ QUEUES = {
     Q_NOTIFICATION: [RK_ORDER_FULFILLED],
 }
 
+EVENT_TYPES = {
+    RK_ORDER_REQUESTED: "OrderRequested",
+    RK_ORDER_PLACED: "OrderPlaced",
+    RK_PAYMENT_APPLIED: "PaymentApplied",
+    RK_ORDER_FULFILLED: "OrderFulfilled",
+    RK_EMAIL_SENT: "EmailSent",
+}
+
 
 def declare_topology(channel):
     """Declare exchange, queues and bindings."""
