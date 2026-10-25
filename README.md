@@ -286,18 +286,6 @@ docker compose start payment
 ```
 
 ## Resultados
-<!-- Agrega aquí tus capturas en docs/ y tus conclusiones -->
-
-![Servicios corriendo con docker compose ps](docs/compose_ps.png)
-
-![Ejecución de place_order.py](docs/place_order.png)
-
-![Log de eventos](docs/events_log.png)
-
-![Exchange topic en el panel de RabbitMQ](docs/rabbitmq_exchange.png)
-
-![Colas en el panel de RabbitMQ](docs/rabbitmq_queues.png)
-
 - Con un solo comando (`place_order.py`) se dispara el flujo completo y los 4 servicios reaccionan en cadena sin conocerse entre sí.
 - El topic exchange permite agregar nuevos consumidores sin modificar ningún servicio existente.
 - Pydantic define un contrato explícito para los eventos: un evento mal formado se rechaza en el momento con un error claro.
