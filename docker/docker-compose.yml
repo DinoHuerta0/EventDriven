@@ -1,0 +1,23 @@
+name: event-driven
+
+services:
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    environment:
+      PYTHONPATH: /app
+    volumes:
+      - ../test:/app/test:ro
+      - ../common:/app/common:ro
+      - ../client:/app/client:ro
+      - ../service:/app/service:ro
+      - ../logs:/app/logs
+    depends_on:
+      - rabbitmq
